@@ -232,7 +232,7 @@ MSG argument is message plist."
 
 (defun mu4e-alert--get-mu-unread-emails-1 (callback)
   "Get messages from mu and invoke CALLBACK."
-  (when (mu4e~proc-running-p)
+  (when (mu4e-running-p)
     (setq mu4e-alert--header-func-save mu4e-header-func
           mu4e-alert--found-func-save mu4e-found-func
           mu4e-alert--erase-func-save mu4e-erase-func)
@@ -240,7 +240,7 @@ MSG argument is message plist."
           mu4e-found-func (mu4e-alert--get-found-func callback)
           mu4e-erase-func 'mu4e-alert--erase-func)
     (setq mu4e-alert--messages nil)
-    (mu4e~proc-find mu4e-alert-interesting-mail-query
+    (mu4e--server-find mu4e-alert-interesting-mail-query
                     nil
                     :date
                     nil
@@ -373,7 +373,7 @@ This only removes the hints added by `mu4e-alert'"
                            (when (and buffer
                                       (get-buffer-window buffer t))
                              (window-frame (get-buffer-window buffer t))))
-                         (list mu4e~main-buffer-name)))))
+                         (list mu4e-main-buffer-name)))))
 
 (defun mu4e-alert--setup-clear-urgency ()
   "Setup hooks to clear the urgency hooks."
@@ -516,9 +516,9 @@ ALL-MAILS are the all the unread emails"
 
 (defadvice mu4e-context-switch (around mu4e-alert-update-mail-count-modeline disable)
   "Advice `mu4e-context-switch' to update mode-line after changing the context."
-  (let ((context mu4e~context-current))
+  (let ((context mu4e-context-current))
     ad-do-it
-    (unless (equal context mu4e~context-current)
+    (unless (equal context mu4e-context-current)
       (mu4e-alert-update-mail-count-modeline))))
 
 ;;;###autoload
@@ -528,7 +528,7 @@ ALL-MAILS are the all the unread emails"
   (add-to-list 'global-mode-string '(:eval mu4e-alert-mode-line) t)
   (add-hook 'mu4e-view-mode-hook #'mu4e-alert-update-mail-count-modeline)
   (add-hook 'mu4e-index-updated-hook #'mu4e-alert-update-mail-count-modeline)
-  (advice-add #'mu4e~headers-update-handler
+  (advice-add #'mu4e-headers-update-handler
               :after (lambda (&rest _) (mu4e-alert-update-mail-count-modeline))
               '((name . "mu4e-alert")))
   (ad-enable-advice #'mu4e-context-switch 'around 'mu4e-alert-update-mail-count-modeline)
@@ -541,7 +541,7 @@ ALL-MAILS are the all the unread emails"
   (setq global-mode-string (delete '(:eval mu4e-alert-mode-line) global-mode-string))
   (remove-hook 'mu4e-view-mode-hook #'mu4e-alert-update-mail-count-modeline)
   (remove-hook 'mu4e-index-updated-hook #'mu4e-alert-update-mail-count-modeline)
-  (advice-remove #'mu4e~headers-update-handler "mu4e-alert")
+  (advice-remove #'mu4e-headers-update-handler "mu4e-alert")
   (ad-disable-advice #'mu4e-context-switch 'around 'mu4e-alert-update-mail-count-modeline)
   (ad-deactivate #'mu4e-context-switch))
 
