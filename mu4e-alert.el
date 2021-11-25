@@ -221,7 +221,7 @@ See also https://github.com/jwiegley/alert."
 CALLBACK will be invoked by retturned lambda"
   (lambda (found)
     (funcall callback mu4e-alert--messages)
-    (setq mu4e-header-func mu4e-alert--header-func-save
+    (setq mu4e-headers-append-func mu4e-alert--header-func-save
           mu4e-found-func mu4e-alert--found-func-save
           mu4e-erase-func mu4e-alert--erase-func-save)))
 
@@ -233,10 +233,10 @@ MSG argument is message plist."
 (defun mu4e-alert--get-mu-unread-emails-1 (callback)
   "Get messages from mu and invoke CALLBACK."
   (when (mu4e-running-p)
-    (setq mu4e-alert--header-func-save mu4e-header-func
+    (setq mu4e-alert--header-func-save mu4e-headers-append-func
           mu4e-alert--found-func-save mu4e-found-func
           mu4e-alert--erase-func-save mu4e-erase-func)
-    (setq mu4e-header-func 'mu4e-alert--header-func
+    (setq mu4e-headers-append-func 'mu4e-alert--header-func
           mu4e-found-func (mu4e-alert--get-found-func callback)
           mu4e-erase-func 'mu4e-alert--erase-func)
     (setq mu4e-alert--messages nil)
